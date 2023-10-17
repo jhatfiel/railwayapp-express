@@ -3,6 +3,7 @@ import { GamesRouter } from "./routes/games.route.js";
 
 const app = express();
 
+app.use(cors());
 app.use('/api/games', GamesRouter);
 
 // the port that the process listens on is automatically set by railway,
