@@ -1,20 +1,19 @@
 import express from 'express';
 
 import { GAMES } from '../data/db-data';
-import { Game } from '../model/game';
 
 const router = express.Router();
 export { router as GamesRouter };
 
 router.get('/api/games', (req, res) => {
-    const queryParams = req.query as any;
+    const queryParams = req.query;
     let year = Number(queryParams.year),
         week = Number(queryParams.week),
         filter = queryParams.filter || '',
         pageNumber = Number(queryParams.pageNumber) || 0,
         pageSize = Number(queryParams.pageSize);
 
-    let g = GAMES.sort((a:Game, b:Game) => (Number(b.excitement_index||'0') - Number(a.excitement_index||'0')) || a.id-b.id);
+    let g = GAMES.sort((a, b) => (Number(b.excitement_index||'0') - Number(a.excitement_index||'0')) || a.id-b.id);
     if (year === -1) year = g.filter(game => game.completed).reduce((acc, game) => acc = Math.max(acc, game.season), 0);
     if (week === -1) week = g.filter(game => game.completed).reduce((acc, game) => acc = Math.max(acc, game.week), 0);
     // need to check for other query parameters, like:

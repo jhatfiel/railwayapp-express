@@ -1,8 +1,7 @@
-import { Ranking } from '../model/ranking';
-import { Game } from '../model/game';
+const GAMES = require('./2023.json');
+const RANKINGS = require('./2023_rankings.json');
 
-export const GAMES: Game[] = require('./2023.json');
-export const RANKINGS: Ranking[] = require('./2023_rankings.json');
+export { GAMES, RANKINGS };
 
 GAMES.forEach(game => {
     let rForWeek = RANKINGS.filter(r => r.season === game.season && r.week === game.week).map(r => r.polls.filter(p => p.poll === 'AP Top 25').flat()).flat().map(p => p.ranks).flat();
