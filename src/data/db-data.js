@@ -1,7 +1,9 @@
-const GAMES = require('./2023.json');
-const RANKINGS = require('./2023_rankings.json');
+import { readFile } from 'fs/promises';
 
-export { GAMES, RANKINGS };
+let GAMES = JSON.parse(await readFile('src/data/2023.json', 'utf8'));
+let RANKINGS = JSON.parse(await readFile('src/data/2023_rankings.json', 'utf8'));
+
+export { GAMES };
 
 GAMES.forEach(game => {
     let rForWeek = RANKINGS.filter(r => r.season === game.season && r.week === game.week).map(r => r.polls.filter(p => p.poll === 'AP Top 25').flat()).flat().map(p => p.ranks).flat();

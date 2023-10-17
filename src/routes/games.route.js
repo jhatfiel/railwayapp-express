@@ -1,11 +1,11 @@
 import express from 'express';
 
-import { GAMES } from '../data/db-data';
+import { GAMES } from '../data/db-data.js';
 
 const router = express.Router();
 export { router as GamesRouter };
 
-router.get('/api/games', (req, res) => {
+router.get('/', (req, res) => {
     const queryParams = req.query;
     let year = Number(queryParams.year),
         week = Number(queryParams.week),
