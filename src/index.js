@@ -18,5 +18,5 @@ const port = process.env.PORT || 3000;
 
 // the final step is to start your app using the following code:
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on port ${port} CORS=${process.env['APP_URL']}`);
 });
