@@ -36,7 +36,8 @@ router.get('/', (req, res) => {
     //           favorites/starred
 
     if (week !== undefined && week !== '') g = g.filter(game => game.week === weekNum);
-    if (filter === 'top25') g = g.filter(game => game.home_team_ranking || game.away_team_ranking || game.home_team === 'Clemson' || game.away_team === 'Clemson');
+    if (filter.indexOf('Top 25') !== -1) g = g.filter(game => game.home_team_ranking || game.away_team_ranking || game.home_team === 'Clemson' || game.away_team === 'Clemson');
+    if (filter.indexOf('ACC') !== -1) g = g.filter(game => game.home_team_ranking || game.away_team_ranking);
 
     // handle sorting after filtering
     if (sortColumn === 'ei' && sortOrder === 'desc') g = g.sort((a, b) => eiCompare(b, a));
