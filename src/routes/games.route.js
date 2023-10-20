@@ -35,9 +35,15 @@ router.get('/', (req, res) => {
     //           selected conference(s) (group them by Power 5 (ACC/Big Ten/Big 12/Pac-12/SEC)/Group of 5(AAC/CUSA/Mid-American/Mountain West/Sun Belt)
     //           favorites/starred
 
+    console.log(`Filtering: year=${year}, week=${week}, pageSize=${pageSize}, filter=${filter}`);
+
     if (week !== undefined && week !== '') g = g.filter(game => game.week === weekNum);
-    if (filter.indexOf('Top 25') !== -1) g = g.filter(game => game.home_team_ranking || game.away_team_ranking || game.home_team === 'Clemson' || game.away_team === 'Clemson');
-    if (filter.indexOf('ACC') !== -1) g = g.filter(game => game.home_team_ranking || game.away_team_ranking);
+    // filter by top25/conference list
+    g = g.filter(game => {
+        return ( ((game.home_team_ranking || game.away_team_ranking || game.home_team === 'Clemson' || game.away_team === 'Clemson') && filter.indexOf('Top 25') !== -1) ||
+            filter.indexOf(game.home_conference) !== -1 || 
+            filter.indexOf(game.away_conference) !== -1);
+    });
 
     // handle sorting after filtering
     if (sortColumn === 'ei' && sortOrder === 'desc') g = g.sort((a, b) => eiCompare(b, a));
@@ -52,7 +58,8 @@ router.get('/', (req, res) => {
     const initialPos = pageNumber * pageSize;
     const gPage = g.slice(initialPos, initialPos + pageSize);
 
-    let result = {payload: gPage, matchingGames: g.length, maxCompletedWeek: maxCompletedWeek};
+    console.log(`Total results: ${g.length}`);
+    let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxCompletedWeek: maxCompletedWeek};
 
     res.status(200).json(result);
 });
