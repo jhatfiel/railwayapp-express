@@ -37,7 +37,7 @@ router.get('/', (req, res) => {
     //           selected conference(s) (group them by Power 5 (ACC/Big Ten/Big 12/Pac-12/SEC)/Group of 5(AAC/CUSA/Mid-American/Mountain West/Sun Belt)
     //           favorites/starred
 
-    console.log(`Filtering: year=${year}, week=${week}, pageSize=${pageSize}, filter=${filter}`);
+    //console.log(`Filtering: year=${year}, week=${week}, pageSize=${pageSize}, filter=${filter}`);
 
     if (week !== undefined && week !== '') g = g.filter(game => game.week === weekNum);
     // filter by top25/conference list
@@ -48,10 +48,11 @@ router.get('/', (req, res) => {
     });
 
     g.forEach(game => {
-        if (!game.completed) {
-            // lookup spread and win probability to have a basic indication of how close the game will be
-            let pgwp = PREGAME.filter(p => p.gameId === game.id);
-            if (pgwp.length > 0) game.home_win_probability = pgwp[0].homeWinProb;
+        // lookup spread and win probability to have a basic indication of how close the game will be
+        let pgwp = PREGAME.filter(p => p.gameId === game.id);
+        if (pgwp.length > 0) {
+            game.home_win_probability = pgwp[0].homeWinProb;
+            game.spread = pgwp[0].spread;
         }
     })
 
@@ -68,7 +69,7 @@ router.get('/', (req, res) => {
     const initialPos = pageNumber * pageSize;
     const gPage = g.slice(initialPos, initialPos + pageSize);
 
-    console.log(`Total results: ${g.length}`);
+    //console.log(`Total results: ${g.length}`);
     let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxWeek: maxWeek, maxCompletedWeek: maxCompletedWeek};
 
     res.status(200).json(result);
