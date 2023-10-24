@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'express';
 
-import { GAMES } from '../data/db-data.js';
+import { GAMES, PREGAME } from '../data/db-data.js';
 
 const router = express.Router();
 export { router as GamesRouter };
@@ -17,16 +17,18 @@ router.get('/', (req, res) => {
         pageNumber = Number(queryParams.pageNumber) || 0,
         pageSize = Number(queryParams.pageSize);
     let maxCompletedWeek = 1;
+    let maxWeek = 1;
     let weekNum = 1;
     let yearNum = 0;
 
     let g = GAMES;
-    g = g.filter(game => game.completed); // when we do live data this has to change
+    //g = g.filter(game => game.completed); // when we do live data this has to change
     if (year === '-1') year = g.reduce((acc, game) => Math.max(acc, game.season), 0);
     yearNum = Number(year);
     if (year !== undefined && year !== '') g = g.filter(game => game.season === yearNum);
 
-    maxCompletedWeek = g.reduce((acc, game) => Math.max(acc, game.week), 0);
+    maxCompletedWeek = g.filter(game => game.completed).reduce((acc, game) => Math.max(acc, game.week), 0);
+    maxWeek = g.reduce((acc, game) => Math.max(acc, game.week), 0);
     if (week === '-1') week = maxCompletedWeek;
     weekNum = Number(week);
     // need to check for other query parameters, like:
@@ -45,6 +47,14 @@ router.get('/', (req, res) => {
             filter.indexOf(game.away_conference) !== -1);
     });
 
+    g.forEach(game => {
+        if (!game.completed) {
+            // lookup spread and win probability to have a basic indication of how close the game will be
+            let pgwp = PREGAME.filter(p => p.gameId === game.id);
+            if (pgwp.length > 0) game.home_win_probability = pgwp[0].homeWinProb;
+        }
+    })
+
     // handle sorting after filtering
     if (sortColumn === 'ei' && sortOrder === 'desc') g = g.sort((a, b) => eiCompare(b, a));
     if (sortColumn === 'ei' && sortOrder === 'asc') g = g.sort((a, b) => eiCompare(a, b));
@@ -59,11 +69,13 @@ router.get('/', (req, res) => {
     const gPage = g.slice(initialPos, initialPos + pageSize);
 
     console.log(`Total results: ${g.length}`);
-    let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxCompletedWeek: maxCompletedWeek};
+    let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxWeek: maxWeek, maxCompletedWeek: maxCompletedWeek};
 
     res.status(200).json(result);
 });
 
 function eiCompare(a, b) {
-    return (Number(a.excitement_index||'0') - Number(b.excitement_index||'0')) || a.home_team.localeCompare(b.home_team);
+    return (Number(a.excitement_index||'0') - Number(b.excitement_index||'0')) || 
+        Math.abs(.5-b.home_win_probability) - Math.abs(.5-a.home_win_probability) ||
+        a.home_team.localeCompare(b.home_team);
 }

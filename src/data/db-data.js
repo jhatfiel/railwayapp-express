@@ -2,8 +2,9 @@ import { readFile } from 'fs/promises';
 
 let GAMES = JSON.parse(await readFile('src/data/2023.json', 'utf8'));
 let RANKINGS = JSON.parse(await readFile('src/data/2023_rankings.json', 'utf8'));
+let PREGAME = JSON.parse(await readFile('src/data/2023_pregame.json', 'utf8'));
 
-export { GAMES };
+export { GAMES, PREGAME };
 
 GAMES.forEach(game => {
     let rForWeek = RANKINGS.filter(r => r.season === game.season && r.week === game.week).map(r => r.polls.filter(p => p.poll === 'AP Top 25').flat()).flat().map(p => p.ranks).flat();
