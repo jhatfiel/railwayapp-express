@@ -40,7 +40,7 @@ router.get('/', (req, res) => {
     if (week !== undefined && week !== '') g = g.filter(game => game.week === weekNum);
     // filter by top25/conference list
     g = g.filter(game => {
-        return ( ((game.home_team_ranking || game.away_team_ranking || game.home_team === 'Clemson' || game.away_team === 'Clemson') && filter.indexOf('Top 25') !== -1) ||
+        return ( ((game.home_team_ranking || game.away_team_ranking) && filter.indexOf('Top 25') !== -1) ||
             filter.indexOf(game.home_conference) !== -1 || 
             filter.indexOf(game.away_conference) !== -1);
     });
