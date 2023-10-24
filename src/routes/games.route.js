@@ -53,6 +53,9 @@ router.get('/', (req, res) => {
         if (pgwp.length > 0) {
             game.home_win_probability = pgwp[0].homeWinProb;
             game.spread = pgwp[0].spread;
+        } else {
+            game.home_win_probability = 0.5;
+            game.spread = 0;
         }
     })
 
