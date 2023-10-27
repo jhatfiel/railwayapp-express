@@ -79,7 +79,7 @@ router.get('/', (req, res) => {
 });
 
 function eiCompare(a, b) {
-    return (Number(a.excitement_index||'0') - Number(b.excitement_index||'0')) || 
-        Math.abs(.5-b.home_win_probability) - Math.abs(.5-a.home_win_probability) ||
+    return (Number(a.excitement_index||(10 - (Math.abs((a.home_win_probability??0.5)-0.5)*20))||'0') 
+               - Number(b.excitement_index||(10 - (Math.abs((b.home_win_probability??0.5)-0.5)*20))||'0')) || 
         a.home_team.localeCompare(b.home_team);
 }
