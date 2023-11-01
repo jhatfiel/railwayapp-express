@@ -1,13 +1,14 @@
 import express from 'express';
 import cors from 'express';
 
-import { GAMES, PREGAME } from '../data/db-data.js';
+import { GAMES, PREGAME, updateData } from '../data/db-data.js';
 
 const router = express.Router();
 export { router as GamesRouter };
 
 router.use(cors());
 router.get('/', (req, res) => {
+    updateData();
     const queryParams = req.query;
     let year = queryParams.year,
         week = queryParams.week,
