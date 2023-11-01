@@ -7,8 +7,8 @@ const router = express.Router();
 export { router as GamesRouter };
 
 router.use(cors());
-router.get('/', (req, res) => {
-    updateData();
+router.get('/', async (req, res) => {
+    await updateData();
     const queryParams = req.query;
     let year = queryParams.year,
         week = queryParams.week,
