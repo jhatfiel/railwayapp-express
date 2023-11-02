@@ -27,7 +27,6 @@ async function updateData() {
     if (new Date() - lastUpdated > stale) {
         lastUpdated = new Date();
         console.log(`Updating data`);
-        console.log(JSON.stringify(CFBD_OPTIONS));
         let GP = new Promise((resolve, reject) => {
             https.get(`${CFBD_URL}/games?year=2023&seasonType=regular`, CFBD_OPTIONS, res => {
                 let data = '';
@@ -71,4 +70,4 @@ async function updateData() {
     }
 }
 
-export { GAMES, PREGAME, updateData };
+export { GAMES, PREGAME, updateData, lastUpdated };

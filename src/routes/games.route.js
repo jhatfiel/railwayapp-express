@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'express';
 
-import { GAMES, PREGAME, updateData } from '../data/db-data.js';
+import { GAMES, PREGAME, updateData, lastUpdated } from '../data/db-data.js';
 
 const router = express.Router();
 export { router as GamesRouter };
@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
     const gPage = g.slice(initialPos, initialPos + pageSize);
 
     //console.log(`Total results: ${g.length}`);
-    let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxWeek: maxWeek, maxCompletedWeek: maxCompletedWeek};
+    let result = {payload: gPage, matchingGames: g.length, week: week, year: year, maxWeek: maxWeek, maxCompletedWeek: maxCompletedWeek, lastUpdated: lastUpdated};
 
     res.status(200).json(result);
 });
