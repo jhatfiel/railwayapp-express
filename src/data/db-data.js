@@ -25,10 +25,9 @@ fixData();
 
 async function updateData() {
     if (new Date() - lastUpdated > stale) {
-        lastUpdated = new Date();
         console.log(`Updating data`);
         let GP = new Promise((resolve, reject) => {
-            https.get(`${CFBD_URL}/games?year=2023&seasonType=regular`, CFBD_OPTIONS, res => {
+            https.get(`${CFBD_URL}/games?year=2023`, CFBD_OPTIONS, res => {
                 let data = '';
                 res.on('data', chunk => { data += chunk });
                 res.on('close', () => {
@@ -40,7 +39,7 @@ async function updateData() {
             }).on('error', err => { console.log(err.message); reject(err) });
         });
         let RP = new Promise((resolve, reject) => {
-            https.get(`${CFBD_URL}/rankings?year=2023&seasonType=regular`, CFBD_OPTIONS, res => {
+            https.get(`${CFBD_URL}/rankings?year=2023`, CFBD_OPTIONS, res => {
                 let data = '';
                 res.on('data', chunk => { data += chunk });
                 res.on('close', () => {
@@ -52,7 +51,7 @@ async function updateData() {
             }).on('error', err => { console.log(err.message); reject(err) });
         })
         let PP = new Promise((resolve, reject) => {
-            https.get(`${CFBD_URL}/metrics/wp/pregame?year=2023&seasonType=regular`, CFBD_OPTIONS, res => {
+            https.get(`${CFBD_URL}/metrics/wp/pregame?year=2023`, CFBD_OPTIONS, res => {
                 let data = '';
                 res.on('data', chunk => { data += chunk });
                 res.on('close', () => {
@@ -65,6 +64,7 @@ async function updateData() {
         })
         await Promise.all([GP, RP, PP]).then(values => {
             console.log(`Finished with all data retrieval`);
+            lastUpdated = new Date();
             fixData();
         })
     }
