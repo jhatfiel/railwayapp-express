@@ -2,8 +2,10 @@ import { readFile, writeFile } from 'fs/promises';
 import * as https from 'https';
 
 let GAMES = JSON.parse(await readFile('src/data/2023.json', 'utf8'));
+let GAMESP = JSON.parse(await readFile('src/data/2023P.json', 'utf8')); 
 let RANKINGS = JSON.parse(await readFile('src/data/2023_rankings.json', 'utf8'));
 let PREGAME = JSON.parse(await readFile('src/data/2023_pregame.json', 'utf8'));
+let PREGAMEP = JSON.parse(await readFile('src/data/2023P_pregame.json', 'utf8'));
 let lastUpdated = new Date();
 let latestRankingWeek = 1;
 let stale = 1000 * 60 * 60; // (1 hour)
@@ -11,6 +13,11 @@ let CFBD_URL = 'https://api.collegefootballdata.com'
 let CFBD_OPTIONS = { headers: {accept: 'application/json', Authorization: `Bearer ${process.env['CFBD_TOKEN']}`}}
 
 function fixData() {
+    let latestWeek = GAMES[GAMES.length-1].week;
+    console.log('last week', latestWeek);
+    GAMESP.forEach(game => { game.week = latestWeek+1; GAMES.push(game); })
+    PREGAMEP.forEach(pg => { PREGAMEP.push(pg); })
+
     latestRankingWeek = RANKINGS.filter(r => r.polls.some(p => p.poll === 'AP Top 25' || p.poll === 'Playoff Committee Rankings')).reduce((acc, r) => Math.max(acc, r.week), 0);
 
     GAMES.forEach(game => {
