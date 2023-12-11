@@ -16,7 +16,7 @@ function fixData() {
     let latestWeek = GAMES[GAMES.length-1].week;
     console.log('last week', latestWeek);
     GAMESP.forEach(game => { game.week = latestWeek+1; GAMES.push(game); })
-    PREGAMEP.forEach(pg => { PREGAMEP.push(pg); })
+    PREGAMEP.forEach(pg => { PREGAME.push(pg); })
 
     latestRankingWeek = RANKINGS.filter(r => r.polls.some(p => p.poll === 'AP Top 25' || p.poll === 'Playoff Committee Rankings')).reduce((acc, r) => Math.max(acc, r.week), 0);
 
