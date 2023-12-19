@@ -45,6 +45,18 @@ async function updateData() {
                 });
             }).on('error', err => { console.log(err.message); reject(err) });
         });
+        let GPP = new Promise((resolve, reject) => {
+            https.get(`${CFBD_URL}/games?year=2023&seasonType=postseason`, CFBD_OPTIONS, res => {
+                let data = '';
+                res.on('data', chunk => { data += chunk });
+                res.on('close', () => {
+                    GAMESP = JSON.parse(data);
+                    console.log(`Retrieved GAMESP data`);
+                    writeFile('src/data/2023P.json', data, 'utf8');
+                    resolve(GAMESP);
+                });
+            }).on('error', err => { console.log(err.message); reject(err) });
+        });
         let RP = new Promise((resolve, reject) => {
             https.get(`${CFBD_URL}/rankings?year=2023`, CFBD_OPTIONS, res => {
                 let data = '';
@@ -69,7 +81,19 @@ async function updateData() {
                 });
             }).on('error', err => { console.log(err.message); reject(err) });
         })
-        await Promise.all([GP, RP, PP]).then(values => {
+        let PPP = new Promise((resolve, reject) => {
+            https.get(`${CFBD_URL}/metrics/wp/pregame?year=2023&seasonType=postseason`, CFBD_OPTIONS, res => {
+                let data = '';
+                res.on('data', chunk => { data += chunk });
+                res.on('close', () => {
+                    PREGAMEP = JSON.parse(data);
+                    console.log(`Retrieved PREGAMEP data`);
+                    writeFile('src/data/2023P_pregame.json', data, 'utf8');
+                    resolve(PREGAMEP);
+                });
+            }).on('error', err => { console.log(err.message); reject(err) });
+        })
+        await Promise.all([GP, GPP, RP, PP, PPP]).then(values => {
             console.log(`Finished with all data retrieval`);
             lastUpdated = new Date();
             fixData();
