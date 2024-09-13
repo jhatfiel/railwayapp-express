@@ -61,6 +61,7 @@ router.get('/', async (req, res) => {
     })
 
     // handle sorting after filtering
+    console.error('sorting by', sortColumn);
     if (sortColumn === 'ei' && sortOrder === 'desc') g = g.sort((a, b) => eiCompare(b, a));
     if (sortColumn === 'ei' && sortOrder === 'asc') g = g.sort((a, b) => eiCompare(a, b));
     if (sortColumn === 'homeTeamName' && sortOrder === 'desc') g = g.sort((a, b) => b.home_team.localeCompare(a.home_team));
@@ -80,6 +81,8 @@ router.get('/', async (req, res) => {
 });
 
 function eiCompare(a, b) {
+    if (a.completed && !b.completed) return 1;
+    if (b.completed && !a.completed) return -1;
     return (Number(a.excitement_index||(10 - (Math.abs((a.home_win_probability??0.5)-0.5)*20))||'0') 
                - Number(b.excitement_index||(10 - (Math.abs((b.home_win_probability??0.5)-0.5)*20))||'0')) || 
         a.home_team.localeCompare(b.home_team);
