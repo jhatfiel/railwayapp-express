@@ -6,7 +6,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "CFBD_TOKEN= . ./.env && nodemon src/index.js --ignore src/data/",
     "start": "node src/index.js"
   },
   "devDependencies": {

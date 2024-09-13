@@ -1,3 +1,4 @@
+import { statSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import * as https from 'https';
 
@@ -5,20 +6,15 @@ let stale = 1000 * 60 * 60; // (1 hour)
 let CFBD_URL = 'https://api.collegefootballdata.com'
 let CFBD_OPTIONS = { headers: {accept: 'application/json', Authorization: `Bearer ${process.env['CFBD_TOKEN']}`}}
 let latestRankingWeek = 1;
-let lastUpdated = new Date();
+let lastUpdated = 0;
+try { lastUpdated = statSync('src/data/2024.json').mtimeMs; } catch (err) {}
 let GAMES;
 let GAMESP;
 let RANKINGS;
 let PREGAME;
 let PREGAMEP;
 
-await updateData(false);
-
-GAMES = JSON.parse(await readFile('src/data/2024.json', 'utf8'));
-GAMESP = JSON.parse(await readFile('src/data/2024P.json', 'utf8')); 
-RANKINGS = JSON.parse(await readFile('src/data/2024_rankings.json', 'utf8'));
-PREGAME = JSON.parse(await readFile('src/data/2024_pregame.json', 'utf8'));
-PREGAMEP = JSON.parse(await readFile('src/data/2024P_pregame.json', 'utf8'));
+await updateData();
 
 function fixData() {
     let latestWeek = GAMES[GAMES.length-1].week;
@@ -36,11 +32,9 @@ function fixData() {
     })
 }
 
-fixData();
-
-async function updateData(forceUpdate = false) {
-    if (forceUpdate || new Date() - lastUpdated > stale) {
-        console.log(`Updating data`);
+async function updateData() {
+    if (Date.now() - lastUpdated > stale) {
+        console.log(`Updating data ${CFBD_URL} because ${Math.round((Date.now() - lastUpdated)/1000)} seconds have passed`);
         let GP = new Promise((resolve, reject) => {
             https.get(`${CFBD_URL}/games?year=2024`, CFBD_OPTIONS, res => {
                 let data = '';
@@ -104,9 +98,16 @@ async function updateData(forceUpdate = false) {
         await Promise.all([GP, GPP, RP, PP, PPP]).then(values => {
             console.log(`Finished with all data retrieval`);
             lastUpdated = new Date();
-            fixData();
         })
+    } else {
+        GAMES = JSON.parse(await readFile('src/data/2024.json', 'utf8'));
+        GAMESP = JSON.parse(await readFile('src/data/2024P.json', 'utf8')); 
+        RANKINGS = JSON.parse(await readFile('src/data/2024_rankings.json', 'utf8'));
+        PREGAME = JSON.parse(await readFile('src/data/2024_pregame.json', 'utf8'));
+        PREGAMEP = JSON.parse(await readFile('src/data/2024P_pregame.json', 'utf8'));
     }
+
+    fixData();
 }
 
 export { GAMES, PREGAME, updateData, lastUpdated };
