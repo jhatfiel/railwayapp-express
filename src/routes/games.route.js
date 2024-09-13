@@ -54,9 +54,6 @@ router.get('/', async (req, res) => {
         if (pgwp.length > 0) {
             game.home_win_probability = pgwp[0].homeWinProb;
             game.spread = pgwp[0].spread;
-        } else {
-            game.home_win_probability = 0.5;
-            game.spread = 0;
         }
     })
 
@@ -83,6 +80,8 @@ router.get('/', async (req, res) => {
 function eiCompare(a, b) {
     if (a.completed && !b.completed) return 1;
     if (b.completed && !a.completed) return -1;
+    if (a.home_win_probability === undefined && b.home_win_probability !== undefined) return -1;
+    if (b.home_win_probability === undefined && a.home_win_probability !== undefined) return 1;
     return (Number(a.excitement_index||(10 - (Math.abs((a.home_win_probability??0.5)-0.5)*20))||'0') 
                - Number(b.excitement_index||(10 - (Math.abs((b.home_win_probability??0.5)-0.5)*20))||'0')) || 
         a.home_team.localeCompare(b.home_team);
